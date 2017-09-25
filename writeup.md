@@ -219,7 +219,7 @@ Here's a [link to my video result](./output.mp4)
 
 This pipeline fairly well on the `project_video.mp4` file. There are some instances in the video where the lane lines jump a little bit, and this appears to be caused by the presence of shadows where the lane color becomes brighter than the typically black. The video `output.mp4` contains the output video.
 
-Using this pipeline on the challenge video yielded poor results, as can be seen on the `challenge_output.mp4` video. To obtain better results on that set of images, we would like to tweak the parameters and use test images that are more similar to that video.
+Using this pipeline on the challenge video yielded poor results, as can be seen on the [challenge output](./challenge_output.mp4) video. To obtain better results on that set of images, we would like to tweak the parameters and use test images that are more similar to that video.
 
 Further improvements might include an image mask, which would serve to eliminate some of the peripheral lines. In some of the instances, the left wall of the freeway would be strongly detected as a line, which might cause the detection to misinterpret the results in some cases. We tuned the transform parameters to avoid that as much as possible, but a mask around the lane and the horizon would make that even more robust.
 
