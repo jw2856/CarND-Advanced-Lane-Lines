@@ -27,6 +27,7 @@ The goals / steps of this project are the following:
 
 [linethreshold]: ./test_images/line_threshold.png "line threshold"
 [colorthreshold]: ./test_images/color_threshold.png "color threshold"
+[stackedcombined]: ./test_images/stacked_combined.png "stacked combined"
 
 [pipeline1]: ./output_images/pipeline1 "pipeline1"
 [pipeline2]: ./output_images/pipeline2 "pipeline2"
@@ -93,12 +94,19 @@ To create a line threshold, we utilize the Sobel operator in addition to a magni
 
 As this image makes clear, the line threshold alone has a difficult time detecting lane lines that don't have a high gradient. The yellow lane line in this photo is barely visible.
 
-To improve upon this result, we add an additional color thresholding function as well. The color threshold function converts the image into two separate HLS and HSV color spaces, which are tuned and then combined. The result is an image that can highlight lane lines in situations that are much more difficult for the line thresholds alone:
+To improve upon this result, we add an additional color thresholding function as well. The color threshold function converts the image into two separate HLS and HSV color spaces, which are tuned and then combined. The result is an image that can highlight lane lines in situations that are much more difficult for the line threshold alone:
 
-
-| Original Image | Line Threshold |
+| Original Image | Color Threshold |
 |:--------:|:------------:|
 | ![left][calibration4] | ![center][colorthreshold] |
+
+Below is an image that shows the two different thresholding techniques combined on an undistorted test image, and the resulting binary image:
+
+![stacked_combined][stackedcombined]
+
+
+
+
 
 
 
