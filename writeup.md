@@ -66,6 +66,12 @@ Three of the calibration images failed, but we were able to successfully calibra
 |:--------:|:------------:|:------------:|
 | ![left][calibration1] | ![center][calibration2] | ![right][calibration3] |
 
+Here is an example of undistorting one of the test images:
+
+| Original Image | Undistorted |
+|:--------:|:------------:|
+| ![left][calibration4] | ![center][calibration5] |
+
 ### Pipeline (single images)
 
 #### 1. Provide an example of a distortion-corrected image.
