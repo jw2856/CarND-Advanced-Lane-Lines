@@ -20,7 +20,7 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [calibration1]: ./camera_cal/calibration2.jpg "calibration image"
-[calibration2]: ./camera_cal/calibration2.jpg "calibration corners"
+[calibration2]: ./camera_cal/calibration2.jpg-corners.jpg "calibration corners"
 [calibration3]: ./camera_cal/calibration2_undistorted.jpg "undistorted image"
 [calibration4]: ./test_images/test1.jpg "calibration test image"
 [calibration5]: ./test_images/test1_undistorted.jpg "undistorted test image"
