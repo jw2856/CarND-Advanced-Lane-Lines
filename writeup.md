@@ -29,13 +29,6 @@ The goals / steps of this project are the following:
 [colorthreshold]: ./test_images/color_threshold.png "color threshold"
 [stackedcombined]: ./test_images/stacked_combined.png "stacked combined"
 
-[pipeline1]: ./output_images/pipeline1 "pipeline1"
-[pipeline2]: ./output_images/pipeline2 "pipeline2"
-[pipeline3]: ./output_images/pipeline3 "pipeline3"
-[pipeline4]: ./output_images/pipeline4 "pipeline4"
-[pipeline5]: ./output_images/pipeline5 "pipeline5"
-[pipeline6]: ./output_images/pipeline6 "pipeline6"
-
 [thresholded1]: ./output_images/thresholded_image1 "thresholded1"
 [thresholded2]: ./output_images/thresholded_image2 "thresholded2"
 [thresholded3]: ./output_images/thresholded_image3 "thresholded3"
@@ -43,8 +36,17 @@ The goals / steps of this project are the following:
 [thresholded5]: ./output_images/thresholded_image5 "thresholded5"
 [thresholded6]: ./output_images/thresholded_image6 "thresholded6"
 
+[pipeline1]: ./output_images/pipeline1 "pipeline1"
+[pipeline2]: ./output_images/pipeline2 "pipeline2"
+[pipeline3]: ./output_images/pipeline3 "pipeline3"
+[pipeline4]: ./output_images/pipeline4 "pipeline4"
+[pipeline5]: ./output_images/pipeline5 "pipeline5"
+[pipeline6]: ./output_images/pipeline6 "pipeline6"
+
 [search_area]: ./output_images/search_area.jpg "search area"
 [find_window_centroid]: ./output_images/find_window_centroid.jpg "find window centroid"
+
+[drawnlines]: ./output_images/drawn_lines.jpg "drawn lines"
 
 [video1]: ./output.mp4 "Video"
 
@@ -78,6 +80,8 @@ Here is an example of undistorting one of the test images:
 
 ### Pipeline (single images)
 
+#### 1. Thresholded Binary Image
+
 I created a pipeline that does the following to create a binary image:
 
 1. Undistort an image
@@ -104,76 +108,119 @@ Below is an image that shows the two different thresholding techniques combined 
 
 ![stacked_combined][stackedcombined]
 
+Below are the results of creating the thresholded binary image on the test images provided by Udacity:
 
+![1][thresholded1]
+![2][thresholded2]
+![3][thresholded3]
+![4][thresholded4]
+![5][thresholded5]
+![6][thresholded6]
 
+#### 2. Perspective Transform
 
-
-
-
-#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
-
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
-
-![alt text][image3]
-
-#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
-
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+I created a function to warp images called, fittingly, `warp_image`. This function takes an image as an input and uses the following `src` and `dst` calculations warp an input image to make the lane lines roughly parallel:
 
 ```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+    img_size = (image.shape[1], image.shape[0])
+    
+    bottom_width = .62
+    middle_width = .07
+    height_pct = .62
+    bottom_trim =  .935
+
+    src = np.float32([[img.shape[1]*(0.5-middle_width/2), img.shape[0]*height_pct],
+                      [img.shape[1]*(0.5+middle_width/2), img.shape[0]*height_pct],
+                      [img.shape[1]*(0.5-bottom_width/2), img.shape[0]*bottom_trim],
+                      [img.shape[1]*(0.5+bottom_width/2), img.shape[0]*bottom_trim]])
+
+    offset = img_size[0]*.2
+    
+    dst = np.float32([[offset, 0],
+                      [img_size[0]-offset, 0],
+                      [offset, img_size[1]],
+                      [img_size[0]-offset, img_size[1]]])
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 595, 446      | 256, 0        | 
+| 684, 446      | 1024, 0      |
+| 243, 673     | 256, 720      |
+| 1037, 673      | 1024, 720        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+To verify that this code resulted in roughly parallel lane lines, I ran the function on the test images provided by Udacity, and plotted the results. The histogram chart also included shows that the lane lines are pretty well-detected in all of the test images:
 
-![alt text][image4]
+![1][pipeline1]
+![2][pipeline2]
+![3][pipeline3]
+![4][pipeline4]
+![5][pipeline5]
+![6][pipeline6]
 
-#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+#### 3. Finding Lane Pixels
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+Using the code base provided by Udacity, we implement a sliding window technique to find lane lines. This algorithm works by taking the maximum values of the histogram from the left and right sides of an image and using that as a starting point, and then searching in rectangles within certain margins through the rest of the image.
 
-![alt text][image5]
+To visualize this algorithm, I've outputted an image called `find_window_centroid.jpg` that shows the left lane, right lane, and the searched rectangles.
 
-#### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+![find window centroid][find_window_centroid]
 
-I did this in lines # through # in my code in `my_other_file.py`
+To make our search more efficient, if we found a lane in a previous iteration, then we search around that previous iteration. We used the accompanying function `draw_search_area` below to generate an image called `search_area.jpg` that shows the area around which we look for a new lane.
 
-#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+![search area][search_area]
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+#### 4. The `Lane` Class
 
-![alt text][image6]
+We create a couple of helper classes to make our pipeline easier to run. We create a `Lane` class, which contains two `Line` instances. The Line class, as suggested by Udacity, holds values for each lane line, including previously found values that assist us in finding subsequent line values. The `Lane` class contains functions to find the left and right lane lines, process images, and perform sanity checks on subsequently found lane line images.
+
+The `get_curvature` function within the `Lane` class calculates the curvature of the lane by converting the pixels to meters and fitting a second-order polynomial to the curve:
+
+```python
+    def get_curvature(self, y, fitx):
+        # Define y-value where we want radius of curvature
+        # I'll choose the maximum y-value, corresponding to the bottom of the image
+        y_eval = np.max(y)
+        # Define conversions in x and y from pixels space to meters
+        # assume the lane is about 30 meters long and 3.7 meters wide
+        ym_per_pix = 35/720 # meters per pixel in y dimension
+        xm_per_pix = 3.7/800 # meters per pixel in x dimension
+
+        fit_cr = np.polyfit(y * ym_per_pix, fitx * xm_per_pix, 2)
+        curverad = ((1 + (2*fit_cr[0]*y_eval*ym_per_pix + fit_cr[1])**2)**1.5) / np.absolute(2*fit_cr[0])
+        return curverad
+```
+
+The `Lane` class also contains a `sanity_check` function that checks to make sure that subsequently found lane lines make sense compared to previous lines. A valid new lane line must not differ from a previously found lane line in the following ways:
+
+- The radius of curvature must be within 70% of the previously found curvature
+- The base position of the lane (the x position of the lane at the highest y value, i.e., the lane position closest to the car), must not differ by 100 pixels or more, and
+- The x position of the lane at the position furthest from the car must also not differ by 100 pixels or more.
+
+There is the possibility that we decide a lane line in a new frame is not valid, and subsequent lane lines differ more and more from the previous frame. To ameliorate that potential situation, we introduce a variable consecutive_invalid to keep track of the number of consecutive times we found an invalid line. If we find 10 consecutive invalid lines, we use this newfound lane.
+        
+The position of the car is calculated in the `draw_lane` function, which takes the x values of the left lane and the right lane closest to the car, and calculates a difference between that and the center of the image, converting from the pixel space to meters.
+
+The found lane is re-warped back and drawn onto an undistorted image, and the lane curvature and the car's distance from center is added as well. Here is an example image:
+
+![drawn][drawnlines]
 
 ---
 
 ### Pipeline (video)
 
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
-
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./output.mp4)
 
 ---
 
 ### Discussion
 
-#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+This pipeline fairly well on the `project_video.mp4` file. There are some instances in the video where the lane lines jump a little bit, and this appears to be caused by the presence of shadows where the lane color becomes brighter than the typically black. The video `output.mp4` contains the output video.
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Using this pipeline on the challenge video yielded poor results, as can be seen on the `challenge_output.mp4` video. To obtain better results on that set of images, we would like to tweak the parameters and use test images that are more similar to that video.
+
+Further improvements might include an image mask, which would serve to eliminate some of the peripheral lines. In some of the instances, the left wall of the freeway would be strongly detected as a line, which might cause the detection to misinterpret the results in some cases. We tuned the transform parameters to avoid that as much as possible, but a mask around the lane and the horizon would make that even more robust.
+
+Further improvements could be make by tuning the sanity check and the tuning parameters to be a bit more reliable around some of the more troublesome areas of the video, such as when the freeway color became lighter and included shadows.
