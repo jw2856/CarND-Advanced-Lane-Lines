@@ -25,6 +25,9 @@ The goals / steps of this project are the following:
 [calibration4]: ./test_images/test1.jpg "calibration test image"
 [calibration5]: ./test_images/test1_undistorted.jpg "undistorted test image"
 
+[linethreshold]: ./test_images/line_threshold.png "line threshold"
+[colorthreshold]: ./test_images/color_threshold.png "color threshold"
+
 [pipeline1]: ./output_images/pipeline1 "pipeline1"
 [pipeline2]: ./output_images/pipeline2 "pipeline2"
 [pipeline3]: ./output_images/pipeline3 "pipeline3"
@@ -74,10 +77,30 @@ Here is an example of undistorting one of the test images:
 
 ### Pipeline (single images)
 
-#### 1. Provide an example of a distortion-corrected image.
+I created a pipeline that does the following to create a binary image:
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
+1. Undistort an image
+2. Take a line threshold of the image
+3. Take a color threshold of the image
+
+The undistort operation is detailed above, with an example image.
+
+To create a line threshold, we utilize the Sobel operator in addition to a magnitude and directional thresholds. We tuned these filters to achieve a result like the following:
+
+| Original Image | Line Threshold |
+|:--------:|:------------:|
+| ![left][calibration4] | ![center][linethreshold] |
+
+As this image makes clear, the line threshold alone has a difficult time detecting lane lines that don't have a high gradient. The yellow lane line in this photo is barely visible.
+
+To improve upon this result, we add an additional color thresholding function as well. The color threshold function converts the image into two separate HLS and HSV color spaces, which are tuned and then combined. The result is an image that can highlight lane lines in situations that are much more difficult for the line thresholds alone:
+
+
+| Original Image | Line Threshold |
+|:--------:|:------------:|
+| ![left][calibration4] | ![center][colorthreshold] |
+
+
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
